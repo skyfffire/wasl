@@ -1,15 +1,11 @@
 package cn.optical_info.view.gui.panel;
 
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import cn.optical_info.session.UserSession;
 import cn.optical_info.util.COMTools;
@@ -17,7 +13,8 @@ import cn.optical_info.util.IDTool;
 import cn.optical_info.util.ShowMsg;
 import cn.optical_info.util.StartCommIO;
 import cn.optical_info.view.gui.MainFrame;
-import cn.optical_info.view.gui.impl.PanelImpl;
+import cn.optical_info.view.gui.impl.PanelAbstract;
+import cn.optical_info.view.gui.impl.PanelInterface;
 import gnu.io.CommPortIdentifier;
 
 /**
@@ -25,7 +22,7 @@ import gnu.io.CommPortIdentifier;
  * 
  * @author skyfffire@outlook.com
  */
-public class OpreationPanel extends JPanel implements PanelImpl {
+public class OperationPanel extends PanelAbstract {
     private static final long serialVersionUID = -926022870867634036L;
                                                       
     private MainFrame mainFrame = null;                                         // 方便切换MainFrame中的面板
@@ -34,11 +31,16 @@ public class OpreationPanel extends JPanel implements PanelImpl {
     private JButton startSimButton = null;                                      // 开始串口通信
     private JTextArea msgPanel = null;                                          // 串口消息显示面板
     private JButton bindingButton = null;                                       // 绑定路灯数据按钮
-    private JTextField idTextField = null;                                      // ID显示处 
-                                                                                
+    private JTextField idTextField = null;                                      // ID显示处
+
+    private ImageIcon background = new ImageIcon(
+            getClass().getResource("./img/operation_background.png"));          // 背景图
+
     private boolean isConnCOM = false;                                          // 串口通信已打开标志
     
-    public OpreationPanel(MainFrame _mainFrame) {
+    public OperationPanel(MainFrame _mainFrame) {
+        super();
+
         this.mainFrame = _mainFrame;
         
         initThis();
@@ -131,6 +133,13 @@ public class OpreationPanel extends JPanel implements PanelImpl {
         });
         
         add(exit);
+    }
+
+    @Override
+    public void paint(Graphics graphics) {
+        graphics.drawImage(background.getImage(), 0, 0, null);
+
+        exitButton.repaint();
     }
     
     /**

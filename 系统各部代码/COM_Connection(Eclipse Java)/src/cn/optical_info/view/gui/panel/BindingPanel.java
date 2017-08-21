@@ -15,17 +15,18 @@ import cn.optical_info.session.UserSession;
 import cn.optical_info.util.Binding;
 import cn.optical_info.util.ShowMsg;
 import cn.optical_info.view.gui.MainFrame;
-import cn.optical_info.view.gui.impl.PanelImpl;
+import cn.optical_info.view.gui.impl.PanelAbstract;
+import cn.optical_info.view.gui.impl.PanelInterface;
 
 /**
  * 三:Java串口通讯模块绑定面板
  * 
  * @author skyfffire@outlook.com
  */
-public class BindingPanel extends JPanel implements PanelImpl {
+public class BindingPanel extends PanelAbstract {
     private static final long serialVersionUID = -8370729566404937017L;
     
-    private MainFrame mainFrame = null;                                         // 方便切换MainFrame的面板
+    private MainFrame mainFrame = null;                                    // 方便切换MainFrame的面板
     
     JComboBox<String> phySL = new JComboBox<String>();                          // 本地路灯
     JComboBox<String> webSL = new JComboBox<String>();                          // 服务端路灯
@@ -35,6 +36,8 @@ public class BindingPanel extends JPanel implements PanelImpl {
     private COMDAO comDAO = new COMDAO();
 
     public BindingPanel(MainFrame _mainFrame) {
+        super();
+
         this.mainFrame = _mainFrame;
         
         initThis();

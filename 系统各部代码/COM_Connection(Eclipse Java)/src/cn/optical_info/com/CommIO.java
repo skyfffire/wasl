@@ -23,6 +23,8 @@ public class CommIO {
     private InputStream in = null;                                              // 通过串口发来的数据流
     private OutputStream out = null;                                            // 串口反馈给单片机的数据流
     private boolean canSendMsg = true;                                          // 可以发送消息的指令
+    private boolean[] lastState = new boolean[4];                               // 放置路灯的上次反馈的状态
+    private boolean needShowState = false;                                      // 是否需要重新刷新信息
     
     private SLDAO slDAO = new SLDAO();                                          // 路灯DAO层
     
@@ -31,24 +33,18 @@ public class CommIO {
      */
     public void stopIO() {
         isStopIO = true;
-        
+
+        // 不断地检测双向流是否已经关闭
         while (true) {
-            // 直到真正地关闭了IO流之后才开始关闭串口通讯
+            // 关闭双向流有一个延迟，要确保关闭IO才能关闭串口
             if (isCloseInput && isCloseOutput) {
                 UserSession.getSerialPort().close();
                 
                 break;
             }
-            
-            // 1s检测一次
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
         
-        ShowMsg.showSuccessMessage("停止成功", "消息提示");
+        ShowMsg.showSuccessMessage("停止成功", "消息提示");                      // 弹出成功提示
     }
     
     /**
@@ -57,7 +53,7 @@ public class CommIO {
      * @author skyfffire@outlook.com
      */
     public abstract class NeedThread extends Thread {        
-       int arr[] = {-1, 0, 64, 128, 192};                                      // 对位处理的支持
+       int arr[] = {-1, 0, 64, 128, 192};                                       // 对位处理的支持
                                                                                 // 依次的四个二进制数分别为
                                                                                 // 0000-0000
                                                                                 // 0100-0000
@@ -79,8 +75,7 @@ public class CommIO {
         /**
          * 默认构造器
          * 
-         * @param in
-         * @param _msgPanel
+         * @param _in
          */
         public SerialReader(InputStream _in) {
             CommIO.this.in = _in;
@@ -92,67 +87,79 @@ public class CommIO {
         @Override
         public void run() {
             try {
-                int commMsg = 0;
+                int commMsg = 0;                                                // 用于保存串口端发来的数据
 
                 // 不断地读取流中的数据
-                while (true) {                    
-                    // 读取数量计数器
-                    int count = 0;
-                    // 向数据库及界面更新数据
-                    while (count != 2) {
-                        // 保证读取到的四盏路灯数据为最新
-                        if ((commMsg = in.read()) != -1) {                            
-                            count++;
-                            // 打印当前串口发送的数据
+                while (true) {
+                    int msgCount = 0;                                           // 读取消息数量计数器
+                    // 一次读取两组最新数据，然后进入消息等待
+                    while (msgCount < 2) {
+                        // 1.不断地读取，直到到一个合法的数据
+                        if ((commMsg = in.read()) != -1) {
+                            msgCount++;                                         // 读取到一个合法数据之后为数据计数器加一
+                            // 2.将串口数据转换为二进制数据
                             String binaryComm = 
                                     BinaryTool.toBinaryString(commMsg);
-                            // 如果是状态检测
-                            if (BinaryTool.isStateTesting(binaryComm)) {
-                                // 保存每一路灯的状态及消息样式处理
+                            // 3.判断串口数据所要表达的信息
+                            if (BinaryTool.isStateTesting(binaryComm)) {        // 若为状态报告
+                                // 4.保存每一路灯的状态及消息样式处理
                                 String msg = "";
                                 boolean[] state = new boolean[4];
                                 for (int j = 0; j <= 3; j++) {
-                                    // 红外信号被遮挡时就可以检测某一组灯的好坏
+                                    // 5.通过单片机端处理好的信息来判断路灯状态
                                     state[j] = BinaryTool.
                                             isIntact(binaryComm, j);
-                                    
-                                    slDAO.updateState(
-                                            UserSession.getToolID(), 
-                                            j + 1, state[j]?1:0);
-                                    
+
+                                    // 6.与上次路灯状态不同时
+                                    //   才有必要更新数据到数据库
+                                    if (state[j] != lastState[j]) {
+                                        // 7.向数据库更新每一对路灯的状态
+                                        slDAO.updateState(
+                                                UserSession.getToolID(),
+                                                j + 1, state[j]?1:0);
+                                        // 8.此时才有必要更新
+                                        //   显示在GUI上的信息
+                                        needShowState = true;
+                                    }
+
+                                    // 7.组合消息
                                     msg += ("组" + (j + 1) + ": " 
                                     + (state[j]?"状态良好 ":"需要维修 "));
+                                    // 8.更新上次路灯状态信息
+                                    lastState[j] = state[j];
                                 }
-                                
-                                // 温馨提示
-                                if (msg.length() == 0) {
-                                    msg = "遮挡红外后可以检测到损坏情况";
-                                }
-                                
-                                // 如果用户选择了图形界面模式，应该同时打印到图形界面上
-                                JTextArea msgPanel = UserSession.getMsgPanel();
-                                if (msgPanel != null) {
-                                    // 行最大处理
-                                    if (msgPanel.getLineCount() == 15) {
-                                        msgPanel.setText("");
+
+                                // 9.当信息有更新时才打印信息
+                                if (needShowState) {
+                                    // 10.如果用户选择了图形界面模式，应该同时打印到图形界面上
+                                    JTextArea msgPanel = UserSession.getMsgPanel();
+                                    if (msgPanel != null) {
+                                        // 11.行最大处理
+                                        if (msgPanel.getLineCount() == 15) {
+                                            msgPanel.setText("");
+                                        }
+
+                                        // 12.将消息回显到面板上
+                                        msgPanel.append(String.format("%2d | %s\n",
+                                                msgPanel.getLineCount(), msg));
+                                    } else {
+                                        // 11.打印消息到控制台
+                                        System.out.println(msg);
                                     }
-                                    
-                                    // 将消息回显到面板上
-                                    msgPanel.append(String.format("%2d | %s\n", 
-                                            msgPanel.getLineCount(), msg));
-                                } else {
-                                    // 打印消息到控制台
-                                    System.out.println(msg);
+
+                                    needShowState = false;
                                 }
                             } else {
+                                // 1.遍历后四位
                                 for (int c = 7; c >= 4; c--) {
                                     if (binaryComm.charAt(c) == '0') {
                                         continue;
                                     }
                                     
                                     String content = UserSession.getAdmin().getName() 
-                                            + "先生您好，"
-                                            + "您管理的" + slDAO.getSLPlace(UserSession.getToolID(), 8 - c) 
+                                            + "先生您好，+ 您管理的"
+                                            + slDAO.getSLPlace(UserSession
+                                            .getToolID(), 8 - c)
                                             + "附近有人遇见突发状况，需要帮助。";
                                     
                                     // 如果是报警

@@ -28,11 +28,11 @@ public class BinaryTool {
      * 检测某一位置的路灯是否完好
      * 
      * @param binary        满足格式的二进制数据
-     * @param location         
-     * @return
+     * @param location      某一位置
+     * @return              是否
      */
-    public static boolean isIntact(String binary, int localtion) {
-        return binary.charAt(7 - localtion) == '1';
+    public static boolean isIntact(String binary, int location) {
+        return binary.charAt(7 - location) == '1';
     }
     
     /**

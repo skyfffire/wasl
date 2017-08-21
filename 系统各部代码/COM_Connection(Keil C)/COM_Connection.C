@@ -88,6 +88,7 @@ void main()
 				opreation(2, (ch >> 6) + 4, o[ch >> 6]); 
 			}
 
+			// 重新标识指令
 			RI = 0;
 		}
 		else

@@ -47,8 +47,7 @@ public class SendMsg {
                 PrintWriter out = new PrintWriter(conn.getOutputStream());
                 out.print("");
                 
-                System.out.println("等待响应。。。");
-                Thread.sleep(5000);
+                System.err.println("已发送短信通知");
                 
                 // 获取响应
                 Scanner s = new Scanner(conn.getInputStream());

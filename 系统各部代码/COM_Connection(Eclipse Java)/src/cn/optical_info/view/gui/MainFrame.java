@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 
 import cn.optical_info.view.gui.panel.BindingPanel;
 import cn.optical_info.view.gui.panel.LoginPanel;
-import cn.optical_info.view.gui.panel.OpreationPanel;
+import cn.optical_info.view.gui.panel.OperationPanel;
 
 /**
  * 用于摆放各个Panel, 图形界面模式起始处
@@ -18,7 +18,7 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 9069520843013665633L;
 
 	private LoginPanel loginPanel = new LoginPanel(this);                       // 登录面板
-	private OpreationPanel opreationPanel = new OpreationPanel(this);           // 操作面板
+	private OperationPanel opreationPanel = new OperationPanel(this);           // 操作面板
 	private BindingPanel bindingPanel = new BindingPanel(this);                 // 绑定面板
 	
 	public MainFrame() {
@@ -30,6 +30,7 @@ public class MainFrame extends JFrame {
                 System.exit(0);
             }
         });
+	    this.setUndecorated(true);
 	    
         this.add(loginPanel);
 

@@ -1,0 +1,56 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="optical-info(IntelliJ IDEA Java):war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/optical_info_IntelliJ_IDEA_Java__war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="optical-info(IntelliJ IDEA Java)" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="lib" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/el-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/jasper.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/jsp-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/catalina.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/ecj-4.6.3.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/jasper-el.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/jaspic-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-jni.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/catalina-ha.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/servlet-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-dbcp.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-jdbc.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-util.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/catalina-ant.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-coyote.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/websocket-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-i18n-es.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-i18n-fr.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-i18n-ja.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/annotations-api.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/catalina-tribes.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-util-scan.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/tomcat-websocket.jar" />
+          <element id="file-copy" path="$USER_HOME$/Desktop/libs/apache-tomcat-8.5.15/lib/catalina-storeconfig.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/c3p0-0.9.1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/cn.skyfffire-0.5.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/optical-info-tools.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/commons-dbutils-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/commons-logging-1.1.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/commons-beanutils-1.8.3.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../optical-info-server/lib/mysql-connector-java-5.1.41-bin.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/jstl.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/standard.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/c3p0-0.9.1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/cn.skyfffire-0.5.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/commons-dbutils-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/commons-logging-1.1.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/commons-beanutils-1.8.3.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/mysql-connector-java-5.1.41-bin.jar" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="optical-info(IntelliJ IDEA Java)/web/Web" />
+    </root>
+  </artifact>
+</component>

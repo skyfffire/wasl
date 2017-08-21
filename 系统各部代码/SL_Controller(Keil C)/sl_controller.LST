@@ -1,0 +1,191 @@
+C51 COMPILER V9.01   SL_CONTROLLER                                                         06/15/2017 14:54:20 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE SL_CONTROLLER
+OBJECT MODULE PLACED IN sl_controller.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE sl_controller.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*                                                                      
+   2          *               P0.0-P0.3       :       路灯信号控制
+   3          *               P0.4-P0.7       :       红外信号反馈
+   4          *               P1.0-P1.3       :       由本控制终端发送到下一个路灯的信号
+   5          *               P1.4-P1.7       :       由上一个终端发送到本控制终端的信号
+   6          *               P2.0-P2.3       :       是否自动模式
+   7          *               P2.4-P2.7       :       由Web获取的控制信号
+   8          *
+   9          *               Create by skyfffire@outlook.com in 2017-6-1
+  10          */
+  11          
+  12          #include "tools.h"
+  13          
+  14          #define COUNT 30
+  15          #define TIME 50
+  16          
+  17          unsigned char litTime[4] = {0, 0, 0, 0};
+  18          
+  19          void main()
+  20          {
+  21   1              int i = 0;
+  22   1              unsigned char isAuto = 0;
+  23   1              unsigned char isLine = 0;
+  24   1              unsigned char isHeadLit = 0;
+  25   1                                 
+  26   1          P1 = 0XFF;
+  27   1      
+  28   1              while (1)
+  29   1              {
+  30   2                      // 遍历四个路灯
+  31   2                      for (i = X_MIN; i <= 3; i++)
+  32   2                      {
+  33   3                              // 获取串口通讯端发来的自动控制信号
+  34   3                              isAuto = getInfo(2, i);
+  35   3      
+  36   3                              // 自动模式判断，此时为手动模式
+  37   3                              if (!isAuto)
+  38   3                              {
+  39   4                                      opreation(0, i, getInfo(2, i + 4));
+  40   4                              }
+  41   3                              else
+  42   3                              {        
+  43   4                                      // 多端信号检测，表示前方路灯发来的信号
+  44   4                                      if ((!getInfo(1, i + 4) || !getInfo(1, i))
+  45   4                                      && !isHeadLit)
+  46   4                                      {       
+  47   5                                              if (!litTime[i])
+  48   5                                              {
+  49   6                                                      lits[i] = ZHAN_KONG;
+  50   6                                                      isLit[i] = 1;
+  51   6                                              }
+  52   5                                              litTime[i] = COUNT;
+  53   5                                      }
+  54   4      
+  55   4                                      // 红外信号检测，此处表示红外被阻挡
+C51 COMPILER V9.01   SL_CONTROLLER                                                         06/15/2017 14:54:20 PAGE 2   
+
+  56   4                                      if (!getInfo(0, i + 4))
+  57   4                                      {
+  58   5                                              // 让他与周围的灯再亮COUNT单位的TIME 
+  59   5      
+  60   5                                              // 上两盏
+  61   5                                              if (i - 2 <= -1) 
+  62   5                                              {
+  63   6                                                      isLine = 1;
+  64   6                                                      isHeadLit = 1;
+  65   6                                                      opreation(1, 8 + (i - 2), 0);
+  66   6                                              }
+  67   5                                              else
+  68   5                                              {        
+  69   6                                                      if (!litTime[i - 2])
+  70   6                                                      {
+  71   7                                                              lits[i - 2] = ZHAN_KONG;
+  72   7                                                              isLit[i - 2] = 1;
+  73   7                                                      }
+  74   6                                                      litTime[i - 2] = COUNT;
+  75   6                                              }
+  76   5      
+  77   5                                              // 上一盏
+  78   5                                              if (i - 1 <= -1)
+  79   5                                              {
+  80   6                                                      isLine = 1;
+  81   6                                                      isHeadLit = 1;
+  82   6                                                      opreation(1, 8 + (i - 1), 0);
+  83   6                                              } 
+  84   5                                              else
+  85   5                                              {       
+  86   6                                                      if (!litTime[i - 1])
+  87   6                                                      {
+  88   7                                                              lits[i - 1] = ZHAN_KONG;
+  89   7                                                              isLit[i - 1] = 1;
+  90   7                                                      }
+  91   6                                                      litTime[i - 1] = COUNT;
+  92   6                                              }
+  93   5      
+  94   5                                              // 红外所在盏处理
+  95   5                                              if (!litTime[i])
+  96   5                                              {
+  97   6                                                      lits[i] = ZHAN_KONG;
+  98   6                                                      isLit[i] = 1;
+  99   6                                              }
+ 100   5                                              litTime[i] = COUNT;
+ 101   5      
+ 102   5                                              // 下一盏的处理，判断是否需要多端通讯
+ 103   5                                              if (i + 1 >= 4)
+ 104   5                                              {
+ 105   6                                                      isLine = 1;
+ 106   6                                                      opreation(1, (i + 1) % 4, 0);
+ 107   6                                              }
+ 108   5                                              else
+ 109   5                                              {       
+ 110   6                                                      if (!litTime[i + 1])
+ 111   6                                                      {
+ 112   7                                                              lits[i + 1] = ZHAN_KONG;
+ 113   7                                                              isLit[i + 1] = 1;
+ 114   7                                                      }
+ 115   6      
+ 116   6                                                      litTime[i + 1] = COUNT;
+ 117   6                                              }
+C51 COMPILER V9.01   SL_CONTROLLER                                                         06/15/2017 14:54:20 PAGE 3   
+
+ 118   5      
+ 119   5                                              // 下一盏的下一盏的处理，判断是否需要多端通讯
+ 120   5                                              if (i + 2 >= 4)
+ 121   5                                              {
+ 122   6                                                      isLine = 1;
+ 123   6      
+ 124   6                                                      opreation(1, (i + 2) % 4, 0);
+ 125   6                                              }
+ 126   5                                              else
+ 127   5                                              {       
+ 128   6                                                      if (!litTime[i + 2])
+ 129   6                                                      {
+ 130   7                                                              lits[i + 2] = ZHAN_KONG;
+ 131   7                                                              isLit[i + 2] = 1;
+ 132   7                                                      }
+ 133   6      
+ 134   6                                                      litTime[i + 2] = COUNT;
+ 135   6                                              }
+ 136   5                                      }
+ 137   4              
+ 138   4                                      // 如果不做这个判断，会出现：litTime[i] == 255，也就是数据下溢
+ 139   4                                      if (litTime[i]) 
+ 140   4                                      {
+ 141   5                                              litTime[i] -= 1;
+ 142   5      
+ 143   5                                              if (!litTime[i]) 
+ 144   5                                              {
+ 145   6                                                      lits[i] = 0;
+ 146   6                                                      isLit[i] = 0;
+ 147   6                                              }
+ 148   5                                      }
+ 149   4              
+ 150   4                                      opreation(0, i, litTime[i] == 0);
+ 151   4                              }
+ 152   3                      }  
+ 153   2      
+ 154   2                      delay(TIME); 
+ 155   2      
+ 156   2                      if (isLine) 
+ 157   2                      {
+ 158   3                              P1 = 0XFF;
+ 159   3      
+ 160   3                              isLine = 0;
+ 161   3                              isHeadLit = 0;
+ 162   3                      }
+ 163   2              } 
+ 164   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1591    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     18       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,174 @@
+C51 COMPILER V9.01   COM_CONNECTION                                                        06/23/2017 15:46:17 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE COM_CONNECTION
+OBJECT MODULE PLACED IN COM_Connection.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE COM_Connection.C BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*
+   2          *               P0^0 - P0^3 : 路灯方红外信号检测接口，用于检测路灯状态
+   3          *               P0^4 - P0^7 : 路灯方光敏信号检测接口，用于检测路灯状态
+   4          *               
+   5          *               P1^0 - P1^3     : 报警信号
+   6          *               P1^5            : 报警反馈器
+   7          *               P1^6            : 光敏信号反馈
+   8          *               P1^7            : 测试光敏用
+   9          *
+  10          *               P2^0 - P2^3     : 自动模式与非自动模式
+  11          *               P2^4 - P2^7 : 对路灯的实时开关信号              
+  12          *
+  13          *               Create by skyfffire@outlook.com in 2017-6-1
+  14          */
+  15          
+  16          #include "tools.h"
+  17          
+  18          unsigned char sl[5] = {-1, 0, 64, 128, 192};
+  19          unsigned char ch = 0;      
+  20          unsigned char isAuto[4] = {1, 1, 1, 1};
+  21          unsigned char o[4] = {1, 1, 1, 1};
+  22          unsigned char j = 0;
+  23          unsigned int times[4] = {0, 0, 0, 0};
+  24          
+  25          char mustLit(unsigned char num);                                                                                                // 检测某一盏路灯在该亮的时候亮没亮
+  26          
+  27          void main()
+  28          {
+  29   1              init_serialcomm();
+  30   1              delay_1s();       
+  31   1                
+  32   1              P1 = 0XFF;
+  33   1      
+  34   1              while (1)
+  35   1              {
+  36   2                      // 检测是否有报警信号, 有就触发报警器
+  37   2                      opreation(1, 5, !(times[0] || times[1] || times[2] || times[3]));
+  38   2      
+  39   2                      // 报警信号持久化
+  40   2                      if (!getInfo(1, 0)) times[0] = 4000;
+  41   2                      if (!getInfo(1, 1)) times[1] = 4000;
+  42   2                      if (!getInfo(1, 2)) times[2] = 4000;
+  43   2                      if (!getInfo(1, 3)) times[3] = 4000;
+  44   2      
+  45   2                      // 报警信号还在
+  46   2                      if (times[0] || times[1] || times[2] || times[3])
+  47   2                      {
+  48   3                              if (times[0]) times[0]--;
+  49   3                              if (times[1]) times[1]--;
+  50   3                              if (times[2]) times[2]--;
+  51   3                              if (times[3]) times[3]--;
+  52   3      
+  53   3                              // 发送具体报警位置到Java
+  54   3                              send_char_com(((times[3] > 0) << 3) + ((times[2] > 0) << 2) 
+  55   3                              + ((times[1] > 0) << 1) + ((times[0] > 0)));
+C51 COMPILER V9.01   COM_CONNECTION                                                        06/23/2017 15:46:17 PAGE 2   
+
+  56   3                      }
+  57   2      
+  58   2                      // 手动中断
+  59   2                      if (RI)
+  60   2                      {
+  61   3                              ch = SBUF;
+  62   3      
+  63   3                              isAuto[ch >> 6] = ((ch & 2) == 2);
+  64   3      
+  65   3                              // 管理员控制优先级高于光敏控制优先级，故非自动模式不启用光敏信号
+  66   3                              // 自动模式判断
+  67   3                              if (isAuto[ch >> 6])
+  68   3                              {
+  69   4                                      // 获取光敏感应信号是否不是夜间、雨天、雾天等能见度底的天气
+  70   4                                      if (!getInfo(1, 6) && !getInfo(1, 7))
+  71   4                                      {
+  72   5                                              opreation(2, ch >> 6, 0);
+  73   5              
+  74   5                                              opreation(2, ch >> 6 + 4, OFF);
+  75   5                                      }
+  76   4                                      else
+  77   4                                      {
+  78   5                                              opreation(2, ch >> 6, isAuto[ch >> 6]);
+  79   5                                      }
+  80   4                              }
+  81   3                              else
+  82   3                              {
+  83   4                                      // 非自动模式下
+  84   4                                      // 声明：服务端即将控制此路灯
+  85   4                                      opreation(2, ch >> 6, isAuto[ch >> 6]);
+  86   4                                      // 发送服务端控制信号
+  87   4                                      o[ch >> 6] = !(ch & 1);
+  88   4                                      opreation(2, (ch >> 6) + 4, o[ch >> 6]); 
+  89   4                              }
+  90   3      
+  91   3                              RI = 0;
+  92   3                      }
+  93   2                      else
+  94   2                      {
+  95   3                              // 对四盏路灯的控制信号进行遍历
+  96   3                              for (j = 0; j <= 3; j++)
+  97   3                              {
+  98   4                                      if (isAuto[j])
+  99   4                                      {       
+ 100   5                                              // 获取光敏感应信号是否不是夜间、雨天、雾天等能见度底的天气
+ 101   5                                              if (!getInfo(1, 6) && !getInfo(1, 7))
+ 102   5                                              {
+ 103   6                                                      opreation(2, j, 0);
+ 104   6                                                                      
+ 105   6                                                      opreation(2, j + 4, OFF);
+ 106   6                                              }
+ 107   5                                              else
+ 108   5                                              {
+ 109   6                                                      opreation(2, j, isAuto[j]);
+ 110   6                                              }
+ 111   5                                      }
+ 112   4                                      else
+ 113   4                                      {
+ 114   5                                              opreation(2, j, isAuto[j]);
+ 115   5      
+ 116   5                                              opreation(2, j + 4, o[j]);
+ 117   5                                      }
+C51 COMPILER V9.01   COM_CONNECTION                                                        06/23/2017 15:46:17 PAGE 3   
+
+ 118   4                              }
+ 119   3                      }
+ 120   2      
+ 121   2                      
+ 122   2                      // 1111-0000为前面的240，标识路灯检测信号
+ 123   2                      // 后面分别左移路灯号对应位数，方便Java进行数据处理
+ 124   2                      send_char_com(240 + (mustLit(3) << 3) + (mustLit(2) << 2) 
+ 125   2                      + (mustLit(1) << 1) + (mustLit(0)));
+ 126   2      
+ 127   2                      delay_1us();
+ 128   2              }
+ 129   1      }
+ 130          
+ 131          char mustLit(unsigned char num)
+ 132          {
+ 133   1              char j = 0;
+ 134   1              // 服务端控制时
+ 135   1              if (!isAuto[num] && !o[num] && getInfo(0, 4 + num))
+ 136   1              {
+ 137   2                      return 0;
+ 138   2              }
+ 139   1      
+ 140   1              // 本地控制时
+ 141   1              if (!getInfo(0, num) && getInfo(0, 4 + num))
+ 142   1              {
+ 143   2                      return 0;
+ 144   2              }
+ 145   1      
+ 146   1              return 1;
+ 147   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1539    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     24       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

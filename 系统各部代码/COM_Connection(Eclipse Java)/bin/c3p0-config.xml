@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c3p0-config>
+	<default-config>
+		<property name="driverClass">com.mysql.jdbc.Driver</property>
+		<property name="jdbcUrl">jdbc:mysql://123.207.115.64/three_sl?useSSL=true</property>
+		<property name="user">three_admin</property>
+		<property name="password">three_admin</property>
+	</default-config> 
+</c3p0-config>

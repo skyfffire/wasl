@@ -1,0 +1,4 @@
+"STARTUP.obj",
+"COM_Connection.obj" 
+TO "COM_Connection" 
+RAMSIZE(256) 

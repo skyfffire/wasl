@@ -1,0 +1,4 @@
+"STARTUP.obj",
+"sl_controller.obj" 
+TO "SL_Controller" 
+RAMSIZE(256) 

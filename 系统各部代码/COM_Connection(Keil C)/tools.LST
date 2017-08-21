@@ -1,0 +1,51 @@
+C51 COMPILER V9.01   TOOLS                                                                 05/16/2017 11:17:14 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE TOOLS
+OBJECT MODULE PLACED IN tools.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE tools.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "tools.h"                         
+   2          
+   3          unsigned int ms_cnt = 0;
+   4          
+   5          void delay(int s_time)
+   6          {
+   7   1              ms_cnt = s_time / 10;
+   8   1      
+   9   1              TMOD = 0X01; 
+  10   1              ET0 = 1;
+  11   1      
+  12   1                
+  13   1              TH0 = 0XDB;
+  14   1              TL0 = 0XFE;
+  15   1      
+  16   1              TR0 = 1;
+  17   1              EA = 1;
+  18   1      
+  19   1              while (ms_cnt);
+  20   1      }
+  21          
+  22          void time0() interrupt 1
+  23          {
+  24   1              TH0 = 0XDB;
+  25   1              TL0 = 0XFE;
+  26   1      
+  27   1              ms_cnt--;
+  28   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     52    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
